@@ -1,0 +1,22 @@
+name: Close Issues
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  close_issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close issue if labeled as completed or wontfix
+        if: contains(fromJson('["completed", "wontfix"]'), github.event.label.name)
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            })
